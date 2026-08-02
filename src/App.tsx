@@ -9,7 +9,8 @@ import {
   Cpu,
   Loader2,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react';
 
 // Persist created IDs in LocalStorage for the demo
@@ -222,9 +223,17 @@ export default function App() {
   };
 
   const fillDemoScenario = () => {
-    let counter = parseInt(localStorage.getItem('hackathon_counter') || '1');
-    setNewId(`HACKATHON_${counter.toString().padStart(3, '0')}`);
-    localStorage.setItem('hackathon_counter', (counter + 1).toString());
+    // Smart auto-increment based on currently displayed promises
+    let nextNum = 1;
+    const hackathonPromises = DEMO_PROMISE_IDS.filter(id => id.startsWith('HACKATHON_'));
+    if (hackathonPromises.length > 0) {
+      const nums = hackathonPromises.map(id => parseInt(id.split('_')[1] || '0')).filter(n => !isNaN(n));
+      if (nums.length > 0) {
+        nextNum = Math.max(...nums) + 1;
+      }
+    }
+    
+    setNewId(`HACKATHON_${nextNum.toString().padStart(3, '0')}`);
     setNewStatement("Build a decentralized escrow UI in React and deploy it");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
@@ -233,20 +242,34 @@ export default function App() {
     setBountyAmount("1");
   };
 
+  const handleClearHistory = () => {
+    if (window.confirm("Are you sure you want to clear local test history?")) {
+      DEMO_PROMISE_IDS = ['BTC_001'];
+      localStorage.setItem('demo_ids', JSON.stringify(DEMO_PROMISE_IDS));
+      setPromises([]);
+      fetchAllDemoPromises();
+    }
+  };
+
   return (
     <div>
       <nav className="navbar flex-between">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="brand" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }} onClick={() => fetchAllDemoPromises()}>
           <ShieldCheck size={32} color="var(--accent-color)" />
           <h2>Promise Protocol</h2>
         </div>
-        <button 
-          className="btn-primary" 
-          onClick={handleConnectWallet}
-          style={walletConnected ? { borderColor: 'var(--success-color)', color: 'var(--success-color)', textShadow: 'none', boxShadow: 'none' } : {}}
-        >
-          {walletConnected ? `Connected: ${walletAddress.substring(0,6)}...${walletAddress.substring(walletAddress.length - 4)}` : 'Connect Wallet'}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button className="btn btn-secondary flex-center" onClick={handleClearHistory} title="Clear Demo History">
+            <Trash2 size={20} />
+          </button>
+          <button 
+            className="btn-primary" 
+            onClick={handleConnectWallet}
+            style={walletConnected ? { borderColor: 'var(--success-color)', color: 'var(--success-color)', textShadow: 'none', boxShadow: 'none' } : {}}
+          >
+            {walletConnected ? `Connected: ${walletAddress.substring(0,6)}...${walletAddress.substring(walletAddress.length - 4)}` : 'Connect Wallet'}
+          </button>
+        </div>
       </nav>
 
       <main className="container">
