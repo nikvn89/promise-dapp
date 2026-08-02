@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getClient, CONTRACT_ADDRESS } from './lib/genlayer';
-import { parseStakingAmount } from 'genlayer-js';
+import { parseEther, formatEther } from 'viem';
 import { 
   ShieldCheck, 
   Search, 
@@ -111,7 +111,7 @@ export default function App() {
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
         args: [newId, newStatement, parseInt(newDeadline), domainsArray],
-        value: parseStakingAmount(bountyAmount)
+        value: parseEther(bountyAmount)
       });
       alert("Promise creation transaction sent! Please wait a few seconds for the network to process it.");
       setShowCreate(false);
@@ -282,7 +282,7 @@ export default function App() {
                 <p style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>"{p.statement}"</p>
                 
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                  <p><strong>Bounty:</strong> {p.bounty ? (Number(p.bounty) / 1e18).toString() : '0'} GEN</p>
+                  <p><strong>Bounty:</strong> {p.bounty ? formatEther(BigInt(p.bounty)) : '0'} GEN</p>
                   <p><strong>Trusted Sources:</strong> {p.trusted_domains?.join(', ')}</p>
                   <p><strong>Deadline:</strong> {new Date(p.deadline * 1000).toLocaleString()}</p>
                 </div>
