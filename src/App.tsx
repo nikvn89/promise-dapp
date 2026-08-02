@@ -32,15 +32,15 @@ export default function App() {
   // Create Modal State
   const [showCreate, setShowCreate] = useState(false);
   const [newId, setNewId] = useState('');
-  const [newStatement, setNewStatement] = useState('');
+  const [newStatement, setNewStatement] = useState('Build a Decentralized Escrow UI in React for Promise Protocol');
   const [newDeadline, setNewDeadline] = useState('');
-  const [newDomains, setNewDomains] = useState('');
-  const [bountyAmount, setBountyAmount] = useState('0');
+  const [newDomains, setNewDomains] = useState('githubusercontent.com, vercel.app');
+  const [bountyAmount, setBountyAmount] = useState('1');
 
   // Evidence Modal State
   const [showEvidence, setShowEvidence] = useState(false);
   const [activePromiseId, setActivePromiseId] = useState('');
-  const [evidenceUrl, setEvidenceUrl] = useState('');
+  const [evidenceUrl, setEvidenceUrl] = useState('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
 
   useEffect(() => {
     fetchAllDemoPromises();
