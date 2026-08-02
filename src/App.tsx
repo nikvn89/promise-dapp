@@ -165,8 +165,8 @@ export default function App() {
         args: [id]
       });
       setLoading(true);
-      setLoadingText('AI is evaluating the Github repository... This might take up to 10 seconds...');
-      setTimeout(() => fetchAllDemoPromises(), 10000);
+      setLoadingText('AI is evaluating the Github repository... This might take up to 20 seconds (GenVM Consensus)...');
+      setTimeout(() => fetchAllDemoPromises(), 20000);
     } catch (e: any) {
       alert("Error: " + e.message);
     }
@@ -234,7 +234,7 @@ export default function App() {
     }
     
     setNewId(`HACKATHON_${nextNum.toString().padStart(3, '0')}`);
-    setNewStatement("Build a decentralized escrow UI in React and deploy it");
+    setNewStatement("Build a decentralized escrow UI in React");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
     setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
