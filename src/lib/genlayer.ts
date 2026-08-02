@@ -8,4 +8,5 @@ export const CONTRACT_ADDRESS = "0x0726F885f4bb75BAb9d7b8b8cF3941525F6FA9CA";
 
 export const client = createClient({
   chain: studionet,
+  provider: typeof window !== 'undefined' ? (window as any).ethereum : undefined
 });

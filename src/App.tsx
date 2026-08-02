@@ -103,7 +103,8 @@ export default function App() {
       await client.writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
-        args: [newId, newStatement, parseInt(newDeadline), domainsArray]
+        args: [newId, newStatement, parseInt(newDeadline), domainsArray],
+        account: walletAddress
       });
       alert("Promise creation transaction sent!");
       setShowCreate(false);
@@ -121,7 +122,8 @@ export default function App() {
       await client.writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'add_evidence',
-        args: [activePromiseId, evidenceUrl]
+        args: [activePromiseId, evidenceUrl],
+        account: walletAddress
       });
       alert("Evidence submitted!");
       setShowEvidence(false);
@@ -137,7 +139,8 @@ export default function App() {
       await client.writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
-        args: [id]
+        args: [id],
+        account: walletAddress
       });
       alert("AI Evaluation triggered! It may take a few seconds to reach consensus.");
       // Poll for update
