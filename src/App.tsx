@@ -323,11 +323,13 @@ export default function App() {
                 </div>
 
                 {p.evidence && p.evidence.length > 0 && (
-                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '10px', borderRadius: '8px', marginBottom: '1rem' }}>
-                    <p style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Evidence Submitted:</p>
-                    <a href={p.evidence[0]} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', fontSize: '0.9rem', wordBreak: 'break-all' }}>
-                      {p.evidence[0]} <ExternalLink size={12} style={{ display: 'inline' }}/>
-                    </a>
+                  <div style={{ padding: '0.75rem', backgroundColor: 'var(--surface-color)', borderRadius: '4px', border: '1px solid var(--border-color)', marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Evidence Submitted:</p>
+                    {p.evidence.map((url: string, i: number) => (
+                      <a key={i} href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.875rem', marginBottom: '4px' }}>
+                        {url} <ExternalLink size={12} />
+                      </a>
+                    ))}
                   </div>
                 )}
 
