@@ -12,8 +12,12 @@ import {
   XCircle
 } from 'lucide-react';
 
-// Hardcoded for hackathon demo to show the ones we created
-const DEMO_PROMISE_IDS = ['PROMISE_003', 'WIKI_001', 'BTC_001'];
+// Persist created IDs in LocalStorage for the demo
+const getSavedDemoIds = () => {
+  const saved = localStorage.getItem('demo_ids');
+  return saved ? JSON.parse(saved) : ['BTC_001'];
+};
+let DEMO_PROMISE_IDS = getSavedDemoIds();
 
 export default function App() {
   const [promises, setPromises] = useState<any[]>([]);
@@ -109,10 +113,18 @@ export default function App() {
         args: [newId, newStatement, parseInt(newDeadline), domainsArray],
         value: parseStakingAmount(bountyAmount)
       });
-      alert("Promise creation transaction sent!");
+      alert("Promise creation transaction sent! Please wait a few seconds for the network to process it.");
       setShowCreate(false);
-      if (!DEMO_PROMISE_IDS.includes(newId)) DEMO_PROMISE_IDS.push(newId);
-      fetchAllDemoPromises();
+      if (!DEMO_PROMISE_IDS.includes(newId)) {
+        DEMO_PROMISE_IDS.push(newId);
+        localStorage.setItem('demo_ids', JSON.stringify(DEMO_PROMISE_IDS));
+      }
+      
+      // Add a small delay for the blockchain to mine the transaction
+      setLoading(true);
+      setTimeout(() => {
+        fetchAllDemoPromises();
+      }, 5000);
     } catch (e: any) {
       alert("Error: " + e.message);
     }
@@ -204,7 +216,7 @@ export default function App() {
   };
 
   const fillDemoScenario = () => {
-    setNewId(`HACKATHON_JOB_${Math.floor(Math.random() * 1000)}`);
+    setNewId(`HACKATHON_001`);
     setNewStatement("Build a decentralized escrow UI in React and deploy it");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
