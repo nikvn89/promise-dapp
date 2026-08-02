@@ -317,6 +317,16 @@ export default function App() {
                   <p><strong>Bounty:</strong> {p.bounty ? formatEther(BigInt(p.bounty)) : '0'} GEN</p>
                   <p><strong>Trusted Sources:</strong> {p.trusted_domains?.join(', ')}</p>
                   <p><strong>Deadline:</strong> {new Date(p.deadline * 1000).toLocaleString()}</p>
+                  {p.creator && (
+                    <p style={{ marginTop: '0.5rem' }}>
+                      <strong>Creator:</strong> <span style={{ color: 'var(--accent-color)' }}>{p.creator.substring(0,6)}...{p.creator.substring(p.creator.length-4)}</span>
+                    </p>
+                  )}
+                  {p.dev_address && (
+                    <p>
+                      <strong>Developer:</strong> <span style={{ color: 'var(--success-color)' }}>{p.dev_address.substring(0,6)}...{p.dev_address.substring(p.dev_address.length-4)}</span>
+                    </p>
+                  )}
                 </div>
 
                 {p.evidence && p.evidence.length > 0 && (
