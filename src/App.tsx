@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { client, CONTRACT_ADDRESS } from './lib/genlayer';
+import { getClient, CONTRACT_ADDRESS } from './lib/genlayer';
 import { 
   ShieldCheck, 
   Search, 
@@ -46,7 +46,7 @@ export default function App() {
         DEMO_PROMISE_IDS.map(async (id) => {
           try {
             // @ts-ignore
-            const res = await client.readContract({
+            const res = await getClient().readContract({
               address: CONTRACT_ADDRESS,
               functionName: 'get_promise',
               args: [id]
@@ -74,7 +74,7 @@ export default function App() {
     setLoading(true);
     try {
       // @ts-ignore
-      const res = await client.readContract({
+      const res = await getClient().readContract({
         address: CONTRACT_ADDRESS,
         functionName: 'get_promise',
         args: [searchId]
@@ -98,13 +98,13 @@ export default function App() {
   const handleCreatePromise = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!walletConnected) throw new Error("Please connect your wallet first.");
       const domainsArray = newDomains.split(',').map(d => d.trim());
       // @ts-ignore
-      await client.writeContract({
+      await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
-        args: [newId, newStatement, parseInt(newDeadline), domainsArray],
-        account: walletAddress as any
+        args: [newId, newStatement, parseInt(newDeadline), domainsArray]
       });
       alert("Promise creation transaction sent!");
       setShowCreate(false);
@@ -118,12 +118,12 @@ export default function App() {
   const handleAddEvidence = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!walletConnected) throw new Error("Please connect your wallet first.");
       // @ts-ignore
-      await client.writeContract({
+      await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'add_evidence',
-        args: [activePromiseId, evidenceUrl],
-        account: walletAddress as any
+        args: [activePromiseId, evidenceUrl]
       });
       alert("Evidence submitted!");
       setShowEvidence(false);
@@ -135,12 +135,12 @@ export default function App() {
 
   const handleTriggerEval = async (id: string) => {
     try {
+      if (!walletConnected) throw new Error("Please connect your wallet first.");
       // @ts-ignore
-      await client.writeContract({
+      await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
-        args: [id],
-        account: walletAddress as any
+        args: [id]
       });
       alert("AI Evaluation triggered! It may take a few seconds to reach consensus.");
       // Poll for update

@@ -6,7 +6,8 @@ import { studionet } from "genlayer-js/chains";
 
 export const CONTRACT_ADDRESS = "0x0726F885f4bb75BAb9d7b8b8cF3941525F6FA9CA";
 
-export const client = createClient({
+export const getClient = (account?: string) => createClient({
   chain: studionet,
-  provider: typeof window !== 'undefined' ? (window as any).ethereum : undefined
+  provider: typeof window !== 'undefined' ? (window as any).ethereum : undefined,
+  account: account as any
 });
