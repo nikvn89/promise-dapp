@@ -221,7 +221,8 @@ export default function App() {
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
-        args: [id]
+        args: [id],
+        gas: BigInt(10000000) // Bypass MetaMask's slow gas estimation for this heavy AI function
       });
       
       waitForCondition(async () => {
