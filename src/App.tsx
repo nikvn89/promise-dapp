@@ -76,6 +76,35 @@ export default function App() {
     setLoading(false);
   };
 
+  const waitForCondition = async (checkCondition: () => Promise<boolean>, loadingMsg: string) => {
+    setLoadingText(loadingMsg);
+    
+    let attempts = 0;
+    const maxAttempts = 15; // 15 * 4s = 60s max wait time
+    
+    const poll = async () => {
+      attempts++;
+      try {
+        const isDone = await checkCondition();
+        if (isDone) {
+          await fetchAllDemoPromises();
+          return;
+        }
+      } catch (e) {
+        // silently ignore read errors during polling
+      }
+      
+      if (attempts >= maxAttempts) {
+        await fetchAllDemoPromises();
+        return;
+      }
+      
+      setTimeout(poll, 4000);
+    };
+    
+    setTimeout(poll, 4000);
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchId) return;
@@ -127,11 +156,16 @@ export default function App() {
         localStorage.setItem('demo_ids', JSON.stringify(DEMO_PROMISE_IDS));
       }
       
-      // Smooth loading UI instead of an alert
-      setLoadingText('Transaction Sent! Waiting for GenLayer to mine the block (15s)...');
-      setTimeout(() => {
-        fetchAllDemoPromises();
-      }, 15000);
+      waitForCondition(async () => {
+        // @ts-ignore
+        const res = await getClient().readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: 'get_promise',
+          args: [newId]
+        });
+        return res && res !== '{}';
+      }, 'Transaction Sent! Waiting for GenLayer block confirmation...');
+      
     } catch (e: any) {
       alert("Error: " + e.message);
       setLoading(false);
@@ -147,6 +181,10 @@ export default function App() {
       setLoading(true);
       setLoadingText('Please confirm the evidence submission in your wallet...');
       
+      // get current length to compare
+      const currentPromise = promises.find(p => p.id === activePromiseId);
+      const oldLength = currentPromise?.evidence?.length || 0;
+
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
@@ -154,10 +192,18 @@ export default function App() {
         args: [activePromiseId, evidenceUrl]
       });
       
-      setLoadingText('Submitting Evidence... Waiting for block (15s)...');
-      setTimeout(() => {
-        fetchAllDemoPromises();
-      }, 15000);
+      waitForCondition(async () => {
+        // @ts-ignore
+        const res = await getClient().readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: 'get_promise',
+          args: [activePromiseId]
+        });
+        if (!res || res === '{}') return false;
+        const p = JSON.parse(res as string);
+        return (p.evidence && p.evidence.length > oldLength);
+      }, 'Submitting Evidence... Waiting for block confirmation...');
+      
     } catch (e: any) {
       alert("Error: " + e.message);
       setLoading(false);
@@ -178,8 +224,18 @@ export default function App() {
         args: [id]
       });
       
-      setLoadingText('AI is evaluating... This might take up to 20 seconds (GenVM Consensus)...');
-      setTimeout(() => fetchAllDemoPromises(), 20000);
+      waitForCondition(async () => {
+        // @ts-ignore
+        const res = await getClient().readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: 'get_promise',
+          args: [id]
+        });
+        if (!res || res === '{}') return false;
+        const p = JSON.parse(res as string);
+        return p.status !== 'ACTIVE';
+      }, 'AI is evaluating... Waiting for GenVM Semantic Consensus...');
+      
     } catch (e: any) {
       alert("Error: " + e.message);
       setLoading(false);
