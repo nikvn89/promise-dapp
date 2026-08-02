@@ -80,7 +80,7 @@ export default function App() {
     setLoadingText(loadingMsg);
     
     let attempts = 0;
-    const maxAttempts = 15; // 15 * 4s = 60s max wait time
+    const maxAttempts = 45; // 45 * 4s = 180s max wait time (3 minutes)
     
     const poll = async () => {
       attempts++;
