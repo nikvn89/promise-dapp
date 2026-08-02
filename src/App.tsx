@@ -253,15 +253,21 @@ export default function App() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button className="btn btn-secondary flex-center" onClick={handleClearHistory} title="Clear Demo History">
-            <Trash2 size={20} />
+            <Trash2 size={16} style={{ marginRight: '6px' }} /> Clear History
           </button>
-          <button 
-            className="btn-primary" 
-            onClick={handleConnectWallet}
-            style={walletConnected ? { borderColor: 'var(--success-color)', color: 'var(--success-color)', textShadow: 'none', boxShadow: 'none' } : {}}
-          >
-            {walletConnected ? `Connected: ${walletAddress.substring(0,6)}...${walletAddress.substring(walletAddress.length - 4)}` : 'Connect Wallet'}
-          </button>
+          {walletConnected ? (
+            <button 
+              className="btn-primary" 
+              onClick={() => { setWalletAddress(''); setWalletConnected(false); }}
+              style={{ borderColor: 'var(--success-color)', color: 'var(--success-color)', background: 'rgba(16, 185, 129, 0.1)', textShadow: 'none', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}
+              title="Click to disconnect"
+            >
+              Connected: {walletAddress.substring(0,6)}...{walletAddress.substring(walletAddress.length - 4)}
+              <XCircle size={14} />
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={handleConnectWallet}>Connect Wallet</button>
+          )}
         </div>
       </nav>
 
