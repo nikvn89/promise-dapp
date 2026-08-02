@@ -32,15 +32,15 @@ export default function App() {
   // Create Modal State
   const [showCreate, setShowCreate] = useState(false);
   const [newId, setNewId] = useState('');
-  const [newStatement, setNewStatement] = useState('Build a Decentralized Escrow UI in React for Promise Protocol');
+  const [newStatement, setNewStatement] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
-  const [newDomains, setNewDomains] = useState('githubusercontent.com, vercel.app');
-  const [bountyAmount, setBountyAmount] = useState('1');
+  const [newDomains, setNewDomains] = useState('');
+  const [bountyAmount, setBountyAmount] = useState('');
 
   // Evidence Modal State
   const [showEvidence, setShowEvidence] = useState(false);
   const [activePromiseId, setActivePromiseId] = useState('');
-  const [evidenceUrl, setEvidenceUrl] = useState('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
+  const [evidenceUrl, setEvidenceUrl] = useState('');
 
   useEffect(() => {
     fetchAllDemoPromises();
@@ -456,10 +456,21 @@ export default function App() {
       {showCreate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className="glass-panel" style={{ width: '400px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ margin: 0 }}>Create Promise</h2>
-              <button type="button" onClick={fillDemoScenario} style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>⚡ Auto-fill</button>
-            </div>
+            <h2 className="text-2xl font-bold text-teal-300 flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-6 h-6" /> Create New Promise
+              </div>
+              <button
+                onClick={() => {
+                  setNewStatement('Build a Decentralized Escrow UI in React for Promise Protocol');
+                  setNewDomains('githubusercontent.com, vercel.app');
+                  setBountyAmount('1');
+                }}
+                className="text-xs font-semibold bg-teal-500/20 text-teal-400 px-3 py-1.5 rounded border border-teal-500/30 hover:bg-teal-500/30 transition-colors"
+              >
+                Autofill Demo
+              </button>
+            </h2>
             <form onSubmit={handleCreatePromise}>
               <div className="input-group">
                 <label>Promise ID</label>
@@ -493,7 +504,17 @@ export default function App() {
       {showEvidence && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className="glass-panel" style={{ width: '400px' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Submit Evidence</h2>
+            <h2 className="text-xl font-bold text-teal-300 mb-4 flex justify-between items-center">
+            Submit Evidence
+            <button
+              onClick={() => {
+                setEvidenceUrl('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
+              }}
+              className="text-xs font-semibold bg-teal-500/20 text-teal-400 px-3 py-1.5 rounded border border-teal-500/30 hover:bg-teal-500/30 transition-colors"
+            >
+              Autofill Demo
+            </button>
+            </h2>
             <form onSubmit={handleAddEvidence}>
               <div className="input-group">
                 <label>Evidence URL</label>
