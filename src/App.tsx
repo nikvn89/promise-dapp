@@ -125,10 +125,10 @@ export default function App() {
       
       // Smooth loading UI instead of an alert
       setLoading(true);
-      setLoadingText('Transaction Sent! Waiting for GenLayer to mine the block (5s)...');
+      setLoadingText('Transaction Sent! Waiting for GenLayer to mine the block (15s)...');
       setTimeout(() => {
         fetchAllDemoPromises();
-      }, 5000);
+      }, 15000);
     } catch (e: any) {
       alert("Error: " + e.message);
     }
@@ -146,10 +146,10 @@ export default function App() {
       });
       setShowEvidence(false);
       setLoading(true);
-      setLoadingText('Submitting Evidence... Waiting for block (5s)...');
+      setLoadingText('Submitting Evidence... Waiting for block (15s)...');
       setTimeout(() => {
         fetchAllDemoPromises();
-      }, 5000);
+      }, 15000);
     } catch (e: any) {
       alert("Error: " + e.message);
     }
