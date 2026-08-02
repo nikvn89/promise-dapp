@@ -13,11 +13,11 @@ import {
 } from 'lucide-react';
 
 // Persist created IDs in LocalStorage for the demo
-const getSavedDemoIds = () => {
+const getSavedDemoIds = (): string[] => {
   const saved = localStorage.getItem('demo_ids');
   return saved ? JSON.parse(saved) : ['BTC_001'];
 };
-let DEMO_PROMISE_IDS = getSavedDemoIds();
+let DEMO_PROMISE_IDS: string[] = getSavedDemoIds();
 
 export default function App() {
   const [promises, setPromises] = useState<any[]>([]);
