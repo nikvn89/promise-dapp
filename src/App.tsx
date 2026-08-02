@@ -292,18 +292,7 @@ export default function App() {
     }
   };
 
-  const fillDemoScenario = () => {
-    // Generate a random 6-character hex string to ensure global uniqueness
-    const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
-    
-    setNewId(`PROMISE_${randomHex}`);
-    setNewStatement("Build a decentralized escrow UI in React and deploy it");
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 30);
-    setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
-    setNewDomains("github.com, vercel.app");
-    setBountyAmount("1");
-  };
+
 
   const handleClearHistory = () => {
     if (window.confirm("Are you sure you want to clear local test history?")) {
