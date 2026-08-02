@@ -257,6 +257,7 @@ export default function App() {
                 <p style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>"{p.statement}"</p>
                 
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                  <p><strong>Bounty:</strong> {p.bounty ? (Number(p.bounty) / 1e18).toString() : '0'} GEN</p>
                   <p><strong>Trusted Sources:</strong> {p.trusted_domains?.join(', ')}</p>
                   <p><strong>Deadline:</strong> {new Date(p.deadline * 1000).toLocaleString()}</p>
                 </div>
@@ -301,7 +302,10 @@ export default function App() {
       {showCreate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className="glass-panel" style={{ width: '400px' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Create Promise</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0 }}>Create Promise</h2>
+              <button type="button" onClick={fillDemoScenario} style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>⚡ Auto-fill</button>
+            </div>
             <form onSubmit={handleCreatePromise}>
               <div className="input-group">
                 <label>Promise ID</label>
@@ -314,6 +318,10 @@ export default function App() {
               <div className="input-group">
                 <label>Deadline (Unix Timestamp)</label>
                 <input className="input-field" required type="number" value={newDeadline} onChange={e => setNewDeadline(e.target.value)} />
+              </div>
+              <div className="input-group">
+                <label>Bounty Amount (GEN)</label>
+                <input className="input-field" required type="number" step="0.01" value={bountyAmount} onChange={e => setBountyAmount(e.target.value)} />
               </div>
               <div className="input-group">
                 <label>Trusted Domains (comma separated)</label>
