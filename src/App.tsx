@@ -223,17 +223,10 @@ export default function App() {
   };
 
   const fillDemoScenario = () => {
-    // Smart auto-increment based on currently displayed promises
-    let nextNum = 1;
-    const hackathonPromises = DEMO_PROMISE_IDS.filter(id => id.startsWith('HACKATHON_'));
-    if (hackathonPromises.length > 0) {
-      const nums = hackathonPromises.map(id => parseInt(id.split('_')[1] || '0')).filter(n => !isNaN(n));
-      if (nums.length > 0) {
-        nextNum = Math.max(...nums) + 1;
-      }
-    }
+    // Generate a random 6-character hex string to ensure global uniqueness
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
     
-    setNewId(`HACKATHON_${nextNum.toString().padStart(3, '0')}`);
+    setNewId(`PROMISE_${randomHex}`);
     setNewStatement("Build a decentralized escrow UI in React and deploy it");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
