@@ -458,7 +458,7 @@ export default function App() {
                   const futureDate = new Date();
                   futureDate.setDate(futureDate.getDate() + 30);
                   setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
-                  setNewDomains('githubusercontent.com, vercel.app');
+                  setNewDomains('github.com, githubusercontent.com, vercel.app');
                   setBountyAmount('1');
                 }}
                 style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
