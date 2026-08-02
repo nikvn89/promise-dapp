@@ -110,6 +110,11 @@ export default function App() {
     try {
       if (!walletConnected) throw new Error("Please connect your wallet first.");
       const domainsArray = newDomains.split(',').map(d => d.trim());
+      
+      setShowCreate(false);
+      setLoading(true);
+      setLoadingText('Please confirm the transaction in your wallet...');
+      
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
@@ -117,20 +122,20 @@ export default function App() {
         args: [newId, newStatement, parseInt(newDeadline), domainsArray],
         value: parseEther(bountyAmount)
       });
-      setShowCreate(false);
+      
       if (!DEMO_PROMISE_IDS.includes(newId)) {
         DEMO_PROMISE_IDS.push(newId);
         localStorage.setItem('demo_ids', JSON.stringify(DEMO_PROMISE_IDS));
       }
       
       // Smooth loading UI instead of an alert
-      setLoading(true);
       setLoadingText('Transaction Sent! Waiting for GenLayer to mine the block (15s)...');
       setTimeout(() => {
         fetchAllDemoPromises();
       }, 15000);
     } catch (e: any) {
       alert("Error: " + e.message);
+      setLoading(false);
     }
   };
 
@@ -138,37 +143,47 @@ export default function App() {
     e.preventDefault();
     try {
       if (!walletConnected) throw new Error("Please connect your wallet first.");
+      
+      setShowEvidence(false);
+      setLoading(true);
+      setLoadingText('Please confirm the evidence submission in your wallet...');
+      
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'add_evidence',
         args: [activePromiseId, evidenceUrl]
       });
-      setShowEvidence(false);
-      setLoading(true);
+      
       setLoadingText('Submitting Evidence... Waiting for block (15s)...');
       setTimeout(() => {
         fetchAllDemoPromises();
       }, 15000);
     } catch (e: any) {
       alert("Error: " + e.message);
+      setLoading(false);
     }
   };
 
   const handleTriggerEval = async (id: string) => {
     try {
       if (!walletConnected) throw new Error("Please connect your wallet first.");
+      
+      setLoading(true);
+      setLoadingText('Please confirm the evaluation request in your wallet...');
+      
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
         args: [id]
       });
-      setLoading(true);
-      setLoadingText('AI is evaluating the Github repository... This might take up to 20 seconds (GenVM Consensus)...');
+      
+      setLoadingText('AI is evaluating... This might take up to 20 seconds (GenVM Consensus)...');
       setTimeout(() => fetchAllDemoPromises(), 20000);
     } catch (e: any) {
       alert("Error: " + e.message);
+      setLoading(false);
     }
   };
 
