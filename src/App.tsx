@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getClient, CONTRACT_ADDRESS } from './lib/genlayer';
+import { parseStakingAmount } from 'genlayer-js';
 import { 
   ShieldCheck, 
   Search, 
@@ -29,6 +30,7 @@ export default function App() {
   const [newStatement, setNewStatement] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
   const [newDomains, setNewDomains] = useState('');
+  const [bountyAmount, setBountyAmount] = useState('0');
 
   // Evidence Modal State
   const [showEvidence, setShowEvidence] = useState(false);
@@ -104,7 +106,8 @@ export default function App() {
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
-        args: [newId, newStatement, parseInt(newDeadline), domainsArray]
+        args: [newId, newStatement, parseInt(newDeadline), domainsArray],
+        value: parseStakingAmount(bountyAmount)
       });
       alert("Promise creation transaction sent!");
       setShowCreate(false);
@@ -198,6 +201,16 @@ export default function App() {
       case 'UNVERIFIABLE': return <span className="badge badge-unverifiable"><XCircle size={12} className="mr-1"/> UNVERIFIABLE</span>;
       default: return <span className="badge badge-unverifiable">{status}</span>;
     }
+  };
+
+  const fillDemoScenario = () => {
+    setNewId(`HACKATHON_JOB_${Math.floor(Math.random() * 1000)}`);
+    setNewStatement("Build a decentralized escrow UI in React and deploy it");
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 30);
+    setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
+    setNewDomains("github.com, vercel.app");
+    setBountyAmount("1");
   };
 
   return (
