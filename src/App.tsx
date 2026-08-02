@@ -154,6 +154,30 @@ export default function App() {
     try {
       if (typeof window !== 'undefined' && (window as any).ethereum) {
         const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+        
+        // Force switch to Genlayer Studio Network
+        try {
+          await (window as any).ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0xf22f' }],
+          });
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            await (window as any).ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0xf22f',
+                  chainName: 'Genlayer Studio Network',
+                  rpcUrls: ['https://studio.genlayer.com/api'],
+                  nativeCurrency: { name: 'GEN Token', symbol: 'GEN', decimals: 18 },
+                  blockExplorerUrls: ['https://genlayer-explorer.vercel.app'],
+                },
+              ],
+            });
+          }
+        }
+
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
           setWalletConnected(true);
