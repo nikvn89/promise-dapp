@@ -9,8 +9,7 @@ import {
   Cpu,
   Loader2,
   CheckCircle2,
-  XCircle,
-  Trash2
+  XCircle
 } from 'lucide-react';
 
 // Persist created IDs in LocalStorage for the demo
