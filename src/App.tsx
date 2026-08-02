@@ -104,7 +104,7 @@ export default function App() {
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
         args: [newId, newStatement, parseInt(newDeadline), domainsArray],
-        account: walletAddress
+        account: walletAddress as any
       });
       alert("Promise creation transaction sent!");
       setShowCreate(false);
@@ -123,7 +123,7 @@ export default function App() {
         address: CONTRACT_ADDRESS,
         functionName: 'add_evidence',
         args: [activePromiseId, evidenceUrl],
-        account: walletAddress
+        account: walletAddress as any
       });
       alert("Evidence submitted!");
       setShowEvidence(false);
@@ -140,7 +140,7 @@ export default function App() {
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
         args: [id],
-        account: walletAddress
+        account: walletAddress as any
       });
       alert("AI Evaluation triggered! It may take a few seconds to reach consensus.");
       // Poll for update
