@@ -163,7 +163,7 @@ export default function App() {
           functionName: 'get_promise',
           args: [newId]
         });
-        return res && res !== '{}';
+        return !!res && res !== '{}';
       }, 'Transaction Sent! Waiting for GenLayer block confirmation...');
       
     } catch (e: any) {
