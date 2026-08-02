@@ -234,7 +234,7 @@ export default function App() {
     }
     
     setNewId(`HACKATHON_${nextNum.toString().padStart(3, '0')}`);
-    setNewStatement("Build a decentralized escrow UI in React");
+    setNewStatement("Build a decentralized escrow UI in React and deploy it");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
     setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
