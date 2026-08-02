@@ -149,22 +149,18 @@ export default function App() {
 
   const handleConnectWallet = async () => {
     try {
-      if (window.ethereum) {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      if (typeof window !== 'undefined' && (window as any).ethereum) {
+        const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
           setWalletConnected(true);
         }
       } else {
-        // Fallback mock connection for demo purposes if no extension
-        setWalletAddress('0x' + Math.random().toString(16).slice(2, 10) + '...' + Math.random().toString(16).slice(2, 6));
-        setWalletConnected(true);
+        alert("No Web3 wallet detected! Please install MetaMask or GenLayer Wallet to connect to the real network.");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Wallet connection failed", e);
-      // Fallback
-      setWalletAddress('0x4F9...A1B2');
-      setWalletConnected(true);
+      alert("Failed to connect wallet: " + e.message);
     }
   };
 
