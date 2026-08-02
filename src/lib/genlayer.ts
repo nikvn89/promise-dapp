@@ -4,7 +4,7 @@ import { createClient } from "genlayer-js";
 // For hackathon purposes, we use the default exported configurations.
 import { studionet } from "genlayer-js/chains";
 
-export const CONTRACT_ADDRESS = '0xA6d068aCF27c3138c1e01D13eab57e274929e2fb';
+export const CONTRACT_ADDRESS = '0x3F35265cAeB7A83831910D303f3F2937430CB6Df';
 
 export const getClient = (account?: string) => {
   // @ts-ignore
