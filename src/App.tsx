@@ -445,21 +445,27 @@ export default function App() {
       {showCreate && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className="glass-panel" style={{ width: '400px' }}>
-            <h2 className="text-2xl font-bold text-teal-300 flex items-center justify-between" style={{ marginBottom: '1.5rem' }}>
-              <div className="flex items-center gap-2">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 className="text-2xl font-bold text-teal-300 flex items-center gap-2" style={{ margin: 0 }}>
                 <ShieldCheck className="w-6 h-6" /> Create New Promise
-              </div>
+              </h2>
               <button
+                type="button"
                 onClick={() => {
+                  const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
+                  setNewId(`PROMISE_${randomHex}`);
                   setNewStatement('Build a Decentralized Escrow UI in React for Promise Protocol');
+                  const futureDate = new Date();
+                  futureDate.setDate(futureDate.getDate() + 30);
+                  setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
                   setNewDomains('githubusercontent.com, vercel.app');
                   setBountyAmount('1');
                 }}
-                className="text-xs font-semibold bg-teal-500/20 text-teal-400 px-3 py-1.5 rounded border border-teal-500/30 hover:bg-teal-500/30 transition-colors"
+                style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
               >
-                Autofill Demo
+                ⚡ Auto-fill
               </button>
-            </h2>
+            </div>
             <form onSubmit={handleCreatePromise}>
               <div className="input-group">
                 <label>Promise ID</label>
@@ -493,17 +499,18 @@ export default function App() {
       {showEvidence && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div className="glass-panel" style={{ width: '400px' }}>
-            <h2 className="text-xl font-bold text-teal-300 mb-4 flex justify-between items-center">
-            Submit Evidence
-            <button
-              onClick={() => {
-                setEvidenceUrl('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
-              }}
-              className="text-xs font-semibold bg-teal-500/20 text-teal-400 px-3 py-1.5 rounded border border-teal-500/30 hover:bg-teal-500/30 transition-colors"
-            >
-              Autofill Demo
-            </button>
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 className="text-xl font-bold text-teal-300" style={{ margin: 0 }}>Submit Evidence</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setEvidenceUrl('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
+                }}
+                style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                ⚡ Auto-fill
+              </button>
+            </div>
             <form onSubmit={handleAddEvidence}>
               <div className="input-group">
                 <label>Evidence URL</label>
