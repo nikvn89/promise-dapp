@@ -63,6 +63,15 @@
    npm run dev
    ```
 
+## 📜 Smart Contract Deployment
+
+To run your own instance of the Promise Escrow contract:
+1. Open [GenLayer Studio](https://studio.genlayer.com/).
+2. Create a new Python contract file.
+3. Copy the contents of `promise_escrow.py` from this repository.
+4. Click **Deploy**.
+5. Copy the generated Contract Address and update `CONTRACT_ADDRESS` in `src/lib/genlayer.ts`.
+
 ---
 
 *Built with ❤️ for the GenLayer Hackathon.*
