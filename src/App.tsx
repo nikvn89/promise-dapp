@@ -22,6 +22,7 @@ let DEMO_PROMISE_IDS: string[] = getSavedDemoIds();
 export default function App() {
   const [promises, setPromises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('Loading...');
   const [searchId, setSearchId] = useState('');
   
   // Wallet State
@@ -47,6 +48,7 @@ export default function App() {
 
   const fetchAllDemoPromises = async () => {
     setLoading(true);
+    setLoadingText('Loading Promises...');
     try {
       const results = await Promise.all(
         DEMO_PROMISE_IDS.map(async (id) => {
@@ -78,6 +80,7 @@ export default function App() {
     e.preventDefault();
     if (!searchId) return;
     setLoading(true);
+    setLoadingText('Searching...');
     try {
       // @ts-ignore
       const res = await getClient().readContract({
@@ -113,15 +116,15 @@ export default function App() {
         args: [newId, newStatement, parseInt(newDeadline), domainsArray],
         value: parseEther(bountyAmount)
       });
-      alert("Promise creation transaction sent! Please wait a few seconds for the network to process it.");
       setShowCreate(false);
       if (!DEMO_PROMISE_IDS.includes(newId)) {
         DEMO_PROMISE_IDS.push(newId);
         localStorage.setItem('demo_ids', JSON.stringify(DEMO_PROMISE_IDS));
       }
       
-      // Add a small delay for the blockchain to mine the transaction
+      // Smooth loading UI instead of an alert
       setLoading(true);
+      setLoadingText('Transaction Sent! Waiting for GenLayer to mine the block (5s)...');
       setTimeout(() => {
         fetchAllDemoPromises();
       }, 5000);
@@ -140,9 +143,12 @@ export default function App() {
         functionName: 'add_evidence',
         args: [activePromiseId, evidenceUrl]
       });
-      alert("Evidence submitted!");
       setShowEvidence(false);
-      fetchAllDemoPromises();
+      setLoading(true);
+      setLoadingText('Submitting Evidence... Waiting for block (5s)...');
+      setTimeout(() => {
+        fetchAllDemoPromises();
+      }, 5000);
     } catch (e: any) {
       alert("Error: " + e.message);
     }
@@ -157,8 +163,8 @@ export default function App() {
         functionName: 'trigger_evaluation',
         args: [id]
       });
-      alert("AI Evaluation triggered! It may take a few seconds to reach consensus.");
-      // Poll for update
+      setLoading(true);
+      setLoadingText('AI is evaluating the Github repository... This might take up to 10 seconds...');
       setTimeout(() => fetchAllDemoPromises(), 10000);
     } catch (e: any) {
       alert("Error: " + e.message);
@@ -216,7 +222,9 @@ export default function App() {
   };
 
   const fillDemoScenario = () => {
-    setNewId(`HACKATHON_001`);
+    let counter = parseInt(localStorage.getItem('hackathon_counter') || '1');
+    setNewId(`HACKATHON_${counter.toString().padStart(3, '0')}`);
+    localStorage.setItem('hackathon_counter', (counter + 1).toString());
     setNewStatement("Build a decentralized escrow UI in React and deploy it");
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
@@ -267,8 +275,9 @@ export default function App() {
         </form>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-            <Loader2 className="animate-pulse" size={48} color="var(--accent-color)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem', gap: '1rem' }}>
+            <Loader2 className="animate-pulse" size={48} color="var(--accent-color)" style={{ animation: 'spin 1.5s linear infinite' }} />
+            <p style={{ color: 'var(--accent-color)', fontSize: '1.2rem', fontWeight: 500 }}>{loadingText}</p>
           </div>
         ) : (
           <div className="grid">
