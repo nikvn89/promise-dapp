@@ -267,8 +267,24 @@ export default function App() {
           <h2>Promise Protocol</h2>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button className="btn btn-secondary flex-center" onClick={handleClearHistory} title="Clear Demo History">
-            <Trash2 size={16} style={{ marginRight: '6px' }} /> Clear History
+          <button 
+            onClick={handleClearHistory} 
+            title="Clear Demo History"
+            style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              color: '#ef4444', 
+              border: '1px solid rgba(239, 68, 68, 0.3)', 
+              padding: '0.5rem 1rem', 
+              borderRadius: '6px', 
+              fontSize: '0.875rem', 
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)'; }}
+          >
+            Clear History
           </button>
           {walletConnected ? (
             <button 
