@@ -454,7 +454,7 @@ export default function App() {
                 onClick={() => {
                   const randomHex = Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
                   setNewId(`PROMISE_${randomHex}`);
-                  setNewStatement('Build a Decentralized Escrow UI in React for Promise Protocol');
+                  setNewStatement('Deploy a web interface for Decentralized Escrow & Grants');
                   const futureDate = new Date();
                   futureDate.setDate(futureDate.getDate() + 30);
                   setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
@@ -504,7 +504,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
-                  setEvidenceUrl('https://raw.githubusercontent.com/nikvn89/promise-dapp/main/README.md');
+                  setEvidenceUrl('https://promise-dapp-mn3d84pai-nikkks-projects.vercel.app');
                 }}
                 style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
               >
