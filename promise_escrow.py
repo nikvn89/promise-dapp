@@ -15,7 +15,7 @@ class PromiseEscrowContract(gl.Contract):
         self.evidence_str = "{}"
 
     @gl.public.write.payable
-    def create_promise(self, promise_id: str, statement: str, deadline_ts: int, trusted_domains: list) -> None:
+    def create_promise(self, promise_id: str, statement: str, deadline_ts: int, trusted_domains: list, dev_address: str) -> None:
         """
         Creates a new promise. 
         CRITICAL SECURITY: The creator must define a strict list of trusted_domains (e.g. ['github.com', 'twitter.com']).
@@ -36,7 +36,7 @@ class PromiseEscrowContract(gl.Contract):
             "trusted_domains": trusted_domains,
             "bounty": gl.message.value, # Real Native Token Amount
             "status": "ACTIVE", # ACTIVE, FULFILLED, PARTIALLY_FULFILLED, BROKEN, UNVERIFIABLE, RECOVERED
-            "dev_address": None,
+            "dev_address": dev_address.strip().strip('"').strip("'"),
             "verdict_data": {}
         }
         self.promises_str = json.dumps(promises)
@@ -67,10 +67,7 @@ class PromiseEscrowContract(gl.Contract):
             raise gl.vm.UserError("Deadline has passed, cannot submit evidence")
             
         sender = str(gl.message.sender_address)
-        if promise["dev_address"] is None:
-            # First one to submit becomes the assigned Developer
-            promise["dev_address"] = sender
-        elif promise["dev_address"] != sender:
+        if promise["dev_address"] != sender:
             raise gl.vm.UserError("Only the assigned Developer can submit evidence for this Promise")
             
         # Parse URL and enforce strict domain whitelisting

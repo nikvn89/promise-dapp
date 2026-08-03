@@ -35,6 +35,7 @@ export default function App() {
   const [newStatement, setNewStatement] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
   const [newDomains, setNewDomains] = useState('');
+  const [newDevAddress, setNewDevAddress] = useState('');
   const [bountyAmount, setBountyAmount] = useState('');
 
   // Evidence Modal State
@@ -147,7 +148,7 @@ export default function App() {
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'create_promise',
-        args: [newId, newStatement, parseInt(newDeadline), domainsArray],
+        args: [newId, newStatement, parseInt(newDeadline), domainsArray, newDevAddress],
         value: parseEther(bountyAmount)
       });
       
@@ -504,6 +505,7 @@ export default function App() {
                   futureDate.setDate(futureDate.getDate() + 30);
                   setNewDeadline(Math.floor(futureDate.getTime() / 1000).toString());
                   setNewDomains('github.com, githubusercontent.com, vercel.app');
+                  setNewDevAddress('0xDeveloperAddressHere00000000000000000000');
                   setBountyAmount('1');
                 }}
                 style={{ background: 'var(--accent-color)', color: '#000', padding: '5px 10px', borderRadius: '5px', fontSize: '0.8rem', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
@@ -531,6 +533,10 @@ export default function App() {
               <div className="input-group">
                 <label>Trusted Domains (comma separated)</label>
                 <input className="input-field" required placeholder="github.com, example.com" value={newDomains} onChange={e => setNewDomains(e.target.value)} />
+              </div>
+              <div className="input-group">
+                <label>Developer Wallet Address</label>
+                <input className="input-field" required placeholder="0x..." value={newDevAddress} onChange={e => setNewDevAddress(e.target.value)} />
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button type="submit" className="btn-primary" style={{ flex: 1 }}>Submit</button>
