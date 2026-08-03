@@ -185,11 +185,12 @@ export default function App() {
       const currentPromise = promises.find(p => p.id === activePromiseId);
       const oldLength = currentPromise?.evidence?.length || 0;
 
+      const currentTs = Math.floor(Date.now() / 1000);
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'add_evidence',
-        args: [activePromiseId, evidenceUrl]
+        args: [activePromiseId, evidenceUrl, currentTs]
       });
       
       waitForCondition(async () => {
@@ -217,11 +218,12 @@ export default function App() {
       setLoading(true);
       setLoadingText('Please confirm the evaluation request in your wallet...');
       
+      const currentTs = Math.floor(Date.now() / 1000);
       // @ts-ignore
       await getClient(walletAddress).writeContract({
         address: CONTRACT_ADDRESS,
         functionName: 'trigger_evaluation',
-        args: [id]
+        args: [id, currentTs]
       });
       
       waitForCondition(async () => {
@@ -235,6 +237,40 @@ export default function App() {
         const p = JSON.parse(res as string);
         return p.status !== 'ACTIVE';
       }, 'AI is evaluating... Waiting for GenVM Semantic Consensus...');
+      
+    } catch (e: any) {
+      alert("Error: " + e.message);
+      setLoading(false);
+    }
+  };
+
+  const handleRecoverFunds = async (id: string) => {
+    if (!window.confirm("Are you sure you want to recover funds? The deadline must have passed.")) return;
+    try {
+      if (!walletConnected) throw new Error("Please connect your wallet first.");
+      
+      setLoading(true);
+      setLoadingText('Please confirm the recovery request in your wallet...');
+      const currentTs = Math.floor(Date.now() / 1000);
+      
+      // @ts-ignore
+      await getClient(walletAddress).writeContract({
+        address: CONTRACT_ADDRESS,
+        functionName: 'recover_funds',
+        args: [id, currentTs]
+      });
+      
+      waitForCondition(async () => {
+        // @ts-ignore
+        const res = await getClient().readContract({
+          address: CONTRACT_ADDRESS,
+          functionName: 'get_promise',
+          args: [id]
+        });
+        if (!res || res === '{}') return false;
+        const p = JSON.parse(res as string);
+        return p.status === 'RECOVERED';
+      }, 'Recovering funds... Waiting for GenVM confirmation...');
       
     } catch (e: any) {
       alert("Error: " + e.message);
@@ -415,7 +451,7 @@ export default function App() {
                 )}
 
                 {p.status === 'ACTIVE' && (
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem', flexWrap: 'wrap' }}>
                     <button 
                       className="btn-primary" 
                       style={{ flex: 1, padding: '8px', fontSize: '0.9rem' }}
@@ -431,6 +467,15 @@ export default function App() {
                       >
                         <Cpu size={16} style={{ display: 'inline', marginRight: '5px' }}/>
                         Evaluate
+                      </button>
+                    )}
+                    {(!p.evidence || p.evidence.length === 0) && walletConnected && p.creator && p.creator.toLowerCase() === walletAddress.toLowerCase() && (
+                      <button 
+                        className="btn-primary" 
+                        style={{ flex: 1, padding: '8px', fontSize: '0.9rem', background: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.5)', color: '#ef4444' }}
+                        onClick={() => handleRecoverFunds(p.id)}
+                      >
+                        Recover Funds
                       </button>
                     )}
                   </div>

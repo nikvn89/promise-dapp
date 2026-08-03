@@ -35,7 +35,7 @@ class PromiseEscrowContract(gl.Contract):
             "deadline": deadline_ts,
             "trusted_domains": trusted_domains,
             "bounty": gl.message.value, # Real Native Token Amount
-            "status": "ACTIVE", # ACTIVE, FULFILLED, PARTIALLY_FULFILLED, BROKEN, UNVERIFIABLE
+            "status": "ACTIVE", # ACTIVE, FULFILLED, PARTIALLY_FULFILLED, BROKEN, UNVERIFIABLE, RECOVERED
             "dev_address": None,
             "verdict_data": {}
         }
@@ -46,10 +46,12 @@ class PromiseEscrowContract(gl.Contract):
         self.evidence_str = json.dumps(evidence)
 
     @gl.public.write
-    def add_evidence(self, promise_id: str, url: str) -> None:
+    def add_evidence(self, promise_id: str, url: str, current_ts: int) -> None:
         """
         Adds evidence URLs. 
         CRITICAL SECURITY: Strictly parses the URL and enforces the Source-Authority policy.
+        Enforces that only the assigned Developer can submit after claiming.
+        Enforces Deadline.
         """
         promise_id = promise_id.strip().strip('"').strip("'")
         url = url.strip().strip('"').strip("'")
@@ -60,6 +62,16 @@ class PromiseEscrowContract(gl.Contract):
         promise = promises[promise_id]
         if promise["status"] != "ACTIVE":
             raise gl.vm.UserError("Cannot add evidence, promise is not ACTIVE")
+            
+        if current_ts > promise["deadline"]:
+            raise gl.vm.UserError("Deadline has passed, cannot submit evidence")
+            
+        sender = str(gl.message.sender_address)
+        if promise["dev_address"] is None:
+            # First one to submit becomes the assigned Developer
+            promise["dev_address"] = sender
+        elif promise["dev_address"] != sender:
+            raise gl.vm.UserError("Only the assigned Developer can submit evidence for this Promise")
             
         # Parse URL and enforce strict domain whitelisting
         try:
@@ -83,15 +95,49 @@ class PromiseEscrowContract(gl.Contract):
         if url not in evidence[promise_id]:
             evidence[promise_id].append(url)
             
-        # Lock in the developer's address to receive the bounty if they win
-        if promise["dev_address"] is None:
-            promise["dev_address"] = str(gl.message.sender_address)
-            
         self.evidence_str = json.dumps(evidence)
         self.promises_str = json.dumps(promises)
 
     @gl.public.write
-    def trigger_evaluation(self, promise_id: str) -> None:
+    def recover_funds(self, promise_id: str, current_ts: int) -> None:
+        """
+        Allows the Creator to explicitly recover funds if the Deadline has passed 
+        and no Developer has submitted any evidence. Prevents stranded funds.
+        """
+        promise_id = promise_id.strip().strip('"').strip("'")
+        promises = json.loads(self.promises_str)
+        if promise_id not in promises:
+            raise gl.vm.UserError("Promise not found")
+            
+        promise = promises[promise_id]
+        if promise["status"] != "ACTIVE":
+            raise gl.vm.UserError("Promise must be ACTIVE to recover funds")
+            
+        if str(gl.message.sender_address) != promise["creator"]:
+            raise gl.vm.UserError("Only Creator can recover stranded funds")
+            
+        if current_ts <= promise["deadline"]:
+            raise gl.vm.UserError("Cannot recover funds before Deadline")
+            
+        evidence = json.loads(self.evidence_str).get(promise_id, [])
+        if len(evidence) > 0:
+            raise gl.vm.UserError("Evidence exists, you must use trigger_evaluation instead")
+            
+        promise["status"] = "RECOVERED"
+        
+        # Explicit Recovery Behavior
+        if promise["bounty"] > 0:
+            gl.transfer(promise["creator"], promise["bounty"])
+            
+        self.promises_str = json.dumps(promises)
+
+    @gl.public.write
+    def trigger_evaluation(self, promise_id: str, current_ts: int) -> None:
+        """
+        Evaluates the promise using AI Consensus.
+        Enforces WHO can trigger (Creator or Developer) and WHEN.
+        Executes active payout or refund based on the verdict.
+        """
         promise_id = promise_id.strip().strip('"').strip("'")
         promises = json.loads(self.promises_str)
         if promise_id not in promises:
@@ -101,10 +147,25 @@ class PromiseEscrowContract(gl.Contract):
         if promise["status"] != "ACTIVE":
             raise gl.vm.UserError("Promise must be ACTIVE to evaluate")
             
+        sender = str(gl.message.sender_address)
+        creator = promise["creator"]
+        dev = promise["dev_address"]
+        
+        # Enforce Permissions & Timing
+        if sender == creator:
+            if current_ts <= promise["deadline"]:
+                raise gl.vm.UserError("Creator cannot trigger evaluation before Deadline (must wait for Dev)")
+        elif sender == dev:
+            pass # Developer can trigger evaluation anytime if they finish early
+        else:
+            raise gl.vm.UserError("Only Creator or Developer can trigger evaluation")
+            
         evidence = json.loads(self.evidence_str).get(promise_id, [])
         if not evidence:
-            # Fail-closed handling
+            # Fallback if somehow triggered without evidence
             promise["status"] = "UNVERIFIABLE"
+            if promise["bounty"] > 0:
+                gl.transfer(creator, promise["bounty"])
             self.promises_str = json.dumps(promises)
             return
 
@@ -129,14 +190,13 @@ class PromiseEscrowContract(gl.Contract):
             You are a strict objective auditor. Evaluate if the following promise was fulfilled based ONLY on the evidence provided.
             
             PROMISE TO EVALUATE: {promise['statement']}
-            DEADLINE: {promise['deadline']} (Unix Timestamp)
             
             EVIDENCE SCRAPED FROM WEB:
             {combined_evidence}
             
             INSTRUCTIONS:
             1. If evidence contains 'ERROR_FETCHING_URL_OR_404' and lacks sufficient other data, output UNVERIFIABLE.
-            2. Extract obligations and compare them to reality. Check if events occurred before the DEADLINE.
+            2. Extract obligations and compare them to reality. Check if events occurred.
             3. Respond EXACTLY with a JSON object in this format (no markdown, no quotes):
             {{"verdict": "FULFILLED" | "PARTIALLY_FULFILLED" | "BROKEN" | "UNVERIFIABLE", "confidence_score": <number 0-100>}}
             """
@@ -188,15 +248,26 @@ class PromiseEscrowContract(gl.Contract):
                 return False
 
         final_res = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
-        final_data = json.loads(final_res)
         
-        final_verdict = final_data.get("verdict", "UNVERIFIABLE")
+        try:
+            final_str = final_res if type(final_res) is str else getattr(final_res, "value", "{}")
+            final_data = json.loads(final_str)
+            final_verdict = final_data.get("verdict", "UNVERIFIABLE")
+        except:
+            final_data = {}
+            final_verdict = "UNVERIFIABLE"
+            
         promise["status"] = final_verdict
         promise["verdict_data"] = final_data
         
-        # Real Escrow Execution: Transfer funds to the Dev if FULFILLED
-        # if final_verdict == "FULFILLED" and promise["dev_address"] and promise["bounty"] > 0:
-        #     gl.transfer(promise["dev_address"], promise["bounty"])
+        # ACTIVE PAYOUT & EXPLICIT REFUND BEHAVIOR
+        if promise["bounty"] > 0:
+            if final_verdict == "FULFILLED" and promise["dev_address"]:
+                # Payout to Developer
+                gl.transfer(promise["dev_address"], promise["bounty"])
+            else:
+                # Refund to Creator (for BROKEN, PARTIALLY_FULFILLED, UNVERIFIABLE)
+                gl.transfer(creator, promise["bounty"])
             
         self.promises_str = json.dumps(promises)
 
