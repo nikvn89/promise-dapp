@@ -535,7 +535,7 @@ export default function App() {
                 setNewStatement('The genlayer-project-boilerplate repository is published on GitHub');
                 setNewDeadline(String(Math.floor(Date.now()/1000) + 600));
                 setNewDomains('github.com');
-                setNewDevAddress('');
+                setNewDevAddress('0xFC7b694407fbbc4a20A8AdA59F6D3AbBab49c81B');
                 setBountyAmount('1');
                 setEvidenceWindow('0');
                 setReclaimGrace('86400');
