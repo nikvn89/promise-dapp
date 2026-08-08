@@ -379,7 +379,7 @@ export default function App() {
   };
 
   const getStatusBadge = (status: string) => {
-    const map: Record<string, JSX.Element> = {
+    const map: Record<string, React.ReactElement> = {
       ACTIVE:           <span className="badge badge-active">ACTIVE</span>,
       SETTLED:          <span className="badge badge-fulfilled"><CheckCircle2 size={12} className="mr-1"/> SETTLED</span>,
       FULFILLED:        <span className="badge badge-fulfilled"><CheckCircle2 size={12} className="mr-1"/> FULFILLED</span>,
